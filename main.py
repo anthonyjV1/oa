@@ -27,11 +27,11 @@ def data(x,y):
 
 
 
-data('./oa_dataset/Doubtful/*.jpg', oa_doubtful)
-data('./oa_dataset/Healthy/*.jpg', oa_healthy)
-data('./oa_dataset/Minimal/*.jpg', oa_minimal)
-data('./oa_dataset/Moderate/*.jpg', oa_moderate)  
-data('./oa_dataset/Severe/*.jpg', oa_severe)
+data('./dataset/Doubtful/*.jpg', oa_doubtful)
+data('./dataset/Healthy/*.jpg', oa_healthy)
+data('./dataset/Minimal/*.jpg', oa_minimal)
+data('./dataset/Moderate/*.jpg', oa_moderate)  
+data('./dataset/Severe/*.jpg', oa_severe)
 
 oa_severe = np.array(oa_severe)
 oa_moderate = np.array(oa_moderate)
