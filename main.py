@@ -57,7 +57,7 @@ def plot_random(oa_healthy, oa_severe, oa_doubtful, oa_minimal, oa_moderate, num
     for f in range(num):
         plt.subplot(1, num, f+1)
         plt.title('healthy')
-        plt.imshow(oa_healthy_imgs[f])
+        plt.imshow(oa_doubtful_imgs[f])
 
     plt.figure(figsize= (16,9))
     for f in range(num):
