@@ -1,7 +1,7 @@
 # Import packages
 import numpy as np
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, ConcatDataset
 import glob
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, accuracy_score
@@ -70,3 +70,14 @@ plot_random(oa_healthy, oa_severe, oa_doubtful, oa_minimal, oa_moderate)
 plt.show()
 
 #Creating torch datasets
+
+class Dataset(object):
+    def __getitem__(self, index):
+        raise NotImplementedError
+    def __len__(self):
+        raise NotImplementedError
+    def __add__(self,other):
+        return ConcatDataset([self, other])
+    
+class MRI(Dataset):
+    pass
