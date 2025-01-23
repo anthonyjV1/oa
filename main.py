@@ -145,9 +145,9 @@ class MRI(Dataset):
     def __getitem__(self, index):
         sample = {'image': self.images[index], 'label': self.labels[index]}
         return sample
-
+mri = MRI()
+print(mri[5])
+ # creating a dataloader
     
 
-mri = MRI()
-img = mri[5]['image']
-print(np.max(img))
+
