@@ -148,6 +148,8 @@ class MRI(Dataset):
 mri = MRI()
 print(mri[5])
  # creating a dataloader
-    
+dataloader = DataLoader(mri)
+for sample in dataloader:
+    img = sample['image']
 
 
