@@ -5,6 +5,7 @@ from torch.utils.data import Dataset, DataLoader, ConcatDataset
 import glob
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, accuracy_score
+import random
 import cv2
 
 
@@ -146,10 +147,33 @@ class MRI(Dataset):
         sample = {'image': self.images[index], 'label': self.labels[index]}
         return sample
 mri = MRI()
-print(mri[5])
+
+
+"""index = list(range(len(mri)))
+random.shuffle(index)
+for idx in index:
+    sample = mri[idx]
+    img = sample['image']
+    label = sample['label']
+    plt.title(label)
+    plt.imshow(img)
+    plt.show()
+"""
+it = iter(mri)
+for i in range(10):
+    sample = next(it)
+    img = sample['image']
+    label = sample['label']
+    plt.title(label)
+    plt.imshow(img)
+    plt.show()
+
+
  # creating a dataloader
-dataloader = DataLoader(mri)
+dataloader = DataLoader(mri, batch_size = 10, shuffle=True)
 for sample in dataloader:
     img = sample['image']
+   # plt.imshow(img)
+   # plt.show()
 
 
