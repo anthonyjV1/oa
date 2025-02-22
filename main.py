@@ -10,11 +10,9 @@ import cv2
 
 
 # Reading the images
-oa_severe = []
 oa_moderate = []
-oa_minimal = []
 oa_healthy = []
-oa_doubtful = []
+
 
 def data(x,y):
     path = x
@@ -26,20 +24,12 @@ def data(x,y):
         img = cv2.merge([r, g, b])
         y.append(img)
 
-
-
-data('./dataset/Doubtful/*.jpg', oa_doubtful)
 data('./dataset/Healthy/*.jpg', oa_healthy)
-data('./dataset/Minimal/*.jpg', oa_minimal)
 data('./dataset/Moderate/*.jpg', oa_moderate)  
-data('./dataset/Severe/*.jpg', oa_severe)
 
-oa_severe = np.array(oa_severe)
 oa_moderate = np.array(oa_moderate)
-oa_minimal = np.array(oa_minimal)
 oa_healthy = np.array(oa_healthy)
-oa_doubtful = np.array(oa_doubtful)
-All = np.concatenate((oa_severe, oa_moderate, oa_minimal, oa_healthy, oa_doubtful))
+All = np.concatenate((oa_moderate,oa_healthy))
 
  #print(np.random.choice (7, 6, replace = False))
 
@@ -47,27 +37,24 @@ All = np.concatenate((oa_severe, oa_moderate, oa_minimal, oa_healthy, oa_doubtfu
 #plt.imshow(oa_severe[0])
 #plt.show()
 
-def plot_random(oa_healthy, oa_severe, oa_doubtful, oa_minimal, oa_moderate, num=5):
+def plot_random(oa_healthy, oa_moderate, num=5):
     oa_healthy_imgs = oa_healthy[(np.random.choice (oa_healthy.shape[0], num, replace = False))]
-    oa_severe_imgs = oa_severe[(np.random.choice (oa_severe.shape[0], num, replace = False))]
-    oa_doubtful_imgs = oa_doubtful[(np.random.choice (oa_doubtful.shape[0], num, replace = False))]
-    oa_minimal_imgs = oa_minimal[(np.random.choice (oa_minimal.shape[0], num, replace = False))]
     oa_moderate_imgs = oa_moderate[(np.random.choice (oa_moderate.shape[0], num, replace = False))]
 
     plt.figure(figsize= (16,9))
     for f in range(num):
         plt.subplot(1, num, f+1)
         plt.title('healthy')
-        plt.imshow(oa_doubtful_imgs[f])
+        plt.imshow(oa_healthy_imgs[f])
 
     plt.figure(figsize= (16,9))
     for f in range(num):
         plt.subplot(1, num, f+1)
-        plt.title('severe')
-        plt.imshow(oa_severe_imgs[f])
+        plt.title('osteoarthritis')
+        plt.imshow(oa_moderate_imgs[f])
         
 
-plot_random(oa_healthy, oa_severe, oa_doubtful, oa_minimal, oa_moderate)
+plot_random(oa_healthy, oa_moderate)
 plt.show()
 
 #Creating torch datasets
@@ -83,11 +70,9 @@ class Dataset(object):
 class MRI(Dataset):
     def __init__(self):
         # Prepare images
-        oa_severe = []
         oa_moderate = []
-        oa_minimal = []
         oa_healthy = []
-        oa_doubtful = []
+        
 
         def data(x, y):
             path = x
@@ -101,37 +86,25 @@ class MRI(Dataset):
                 y.append(img)
 
         # Load images into respective lists
-        data('./dataset/Doubtful/*.jpg', oa_doubtful)
         data('./dataset/Healthy/*.jpg', oa_healthy)
-        data('./dataset/Minimal/*.jpg', oa_minimal)
         data('./dataset/Moderate/*.jpg', oa_moderate)
-        data('./dataset/Severe/*.jpg', oa_severe)
 
         # Convert lists to numpy arrays
-        oa_severe = np.array(oa_severe, dtype=np.float32)
         oa_moderate = np.array(oa_moderate, dtype=np.float32)
-        oa_minimal = np.array(oa_minimal, dtype=np.float32)
         oa_healthy = np.array(oa_healthy, dtype=np.float32)
-        oa_doubtful = np.array(oa_doubtful, dtype=np.float32)
 
         # Prepare labels
         label_mapping = {
-            'Doubtful': 0,
+            'Osteoarthritis': 0,
             'Healthy': 1,
-            'Minimal': 2,
-            'Moderate': 3,
-            'Severe': 4
         }
 
-        labels_doubtful = np.full(len(oa_doubtful), label_mapping['Doubtful'], dtype=np.int64)
         labels_healthy = np.full(len(oa_healthy), label_mapping['Healthy'], dtype=np.int64)
-        labels_minimal = np.full(len(oa_minimal), label_mapping['Minimal'], dtype=np.int64)
         labels_moderate = np.full(len(oa_moderate), label_mapping['Moderate'], dtype=np.int64)
-        labels_severe = np.full(len(oa_severe), label_mapping['Severe'], dtype=np.int64)
 
         # Concatenate all images and labels
-        all_images = np.concatenate((oa_doubtful, oa_healthy, oa_minimal, oa_moderate, oa_severe))
-        all_labels = np.concatenate((labels_doubtful, labels_healthy, labels_minimal, labels_moderate, labels_severe))
+        all_images = np.concatenate((oa_healthy,oa_moderate))
+        all_labels = np.concatenate((labels_healthy, labels_moderate))
 
         # Normalize images
         all_images = all_images / 255.0  # Normalize pixel values to [0, 1]
