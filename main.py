@@ -95,7 +95,7 @@ class MRI(Dataset):
 
         # Prepare labels
         label_mapping = {
-            'Osteoarthritis': 0,
+            'Moderate': 0,
             'Healthy': 1,
         }
 
@@ -177,8 +177,11 @@ class CNN(nn.Module):
         x = x.view(x.size(0), -1)
         x = self.fc_model(x)
         x = F.sigmoid(x)
-
         return x
         
+model = CNN()
+#print(model.cnn_model[0].weight.shape)
 
+#Linear layers
+model.fc_model 
         
