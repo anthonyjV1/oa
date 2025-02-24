@@ -184,4 +184,26 @@ model = CNN()
 
 #Linear layers
 model.fc_model 
+
+#Evaluate a New-born neural network
+mri_dataset = MRI()
+mri_dataset.normalize()
+device = torch.device('cuda:0')
+model = CNN().to(device)
+
+dataloader = DataLoader(mri_dataset, batch_size=32, shuffle=False)
+
+model.eval()
+outputs =[]
+y_true = []
+
+with torch.no_grad():
+
+    for D in dataloader:
+        image = D['image'].to(device)
+        label = D['label'].to(device)
         
+        y_hat = model(image)
+        outputs.append(y_hat.cpu().detach().numpy())
+        y_true.append(label.cpu().detach().numpy())
+
