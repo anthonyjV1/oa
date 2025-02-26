@@ -55,7 +55,7 @@ def plot_random(oa_healthy, oa_moderate, num=5):
         
 
 plot_random(oa_healthy, oa_moderate)
-plt.show()
+#plt.show()
 
 #Creating torch datasets
 
@@ -74,20 +74,26 @@ class MRI(Dataset):
         oa_healthy = []
         
 
-        def data(x, y):
-            path = x
-            for i in glob.iglob(path):
-                img = cv2.imread(i)
-                # Resize images to (128, 128)
-                img = cv2.resize(img, (128, 128))
-                # Convert BGR to RGB
-                b, g, r = cv2.split(img)
-                img = cv2.merge([r, g, b])
-                y.append(img)
 
-        # Load images into respective lists
-        data('./dataset/Healthy/*.jpg', oa_healthy)
-        data('./dataset/Moderate/*.jpg', oa_moderate)
+        for i in glob.iglob('./dataset/Healthy/*.jpg'):
+            img = cv2.imread(i)
+            # Resize images to (128, 128)
+            img = cv2.resize(img, (128, 128))
+            # Convert BGR to RGB
+            b, g, r = cv2.split(img)
+            img = cv2.merge([r, g, b])
+            oa_healthy.append(img)
+
+        for i in glob.iglob('./dataset/Moderate/*.jpg'):
+            img = cv2.imread(i)
+            # Resize images to (128, 128)
+            img = cv2.resize(img, (128, 128))
+            # Convert BGR to RGB
+            b, g, r = cv2.split(img)
+            img = cv2.merge([r, g, b])
+            oa_moderate.append(img)
+
+     
 
         # Convert lists to numpy arrays
         oa_moderate = np.array(oa_moderate, dtype=np.float32)
@@ -103,15 +109,14 @@ class MRI(Dataset):
         labels_moderate = np.full(len(oa_moderate), label_mapping['Moderate'], dtype=np.int64)
 
         # Concatenate all images and labels
-        all_images = np.concatenate((oa_healthy,oa_moderate))
-        all_labels = np.concatenate((labels_healthy, labels_moderate))
+        self.images = np.concatenate((oa_healthy,oa_moderate), axis=0)
+        self.labels = np.concatenate((labels_healthy, labels_moderate))
 
         # Normalize images
-        all_images = all_images / 255.0  # Normalize pixel values to [0, 1]
+    def normalize(self):
+        self.images = self.images/255.0  # Normalize pixel values to [0, 1]
 
         # Assign to instance variables
-        self.images = all_images
-        self.labels = all_labels
 
     def __len__(self):
         return self.images.shape[0]
@@ -119,7 +124,8 @@ class MRI(Dataset):
     def __getitem__(self, index):
         sample = {'image': self.images[index], 'label': self.labels[index]}
         return sample
-mri = MRI()
+mri_dataset = MRI()
+mri_dataset.normalize()
 
 
 """index = list(range(len(mri)))
@@ -131,19 +137,19 @@ for idx in index:
     plt.title(label)
     plt.imshow(img)
     plt.show()
-"""
+
 it = iter(mri)
-for i in range(10):
+for i in range(5):
     sample = next(it)
     img = sample['image']
     label = sample['label']
     plt.title(label)
     plt.imshow(img)
     plt.show()
-
+"""
 
  # creating a dataloader
-dataloader = DataLoader(mri, batch_size = 10, shuffle=True)
+dataloader = DataLoader(mri_dataset, batch_size = 10, shuffle=True)
 for sample in dataloader:
     img = sample['image']
    # plt.imshow(img)
@@ -206,4 +212,14 @@ with torch.no_grad():
         y_hat = model(image)
         outputs.append(y_hat.cpu().detach().numpy())
         y_true.append(label.cpu().detach().numpy())
+
+        outputs = np.concatenate(outputs, axis=0).squeeze()
+        y_true = np.concatenate(y_true, axis=0).squeeze()
+
+        def threshold(scores, threshold=0.50, minimum=0, maximum=1.0):
+            x = np.array(list(scores))
+            x[x >= threshold] = maximum
+            x[x < threshold] = minimum
+            return x
+        print(accuracy_score(y_true, threshold(outputs)))
 
